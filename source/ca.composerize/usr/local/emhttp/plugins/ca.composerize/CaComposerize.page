@@ -1,0 +1,137 @@
+Title="Composerize"
+Icon="composerize.png"
+Type="xmenu"
+Menu="Utilities"
+---
+
+<?php
+$docroot = $docroot ?: $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
+$pluginRoot = '/plugins/composerize';
+
+include $docroot . $pluginRoot . '/include/composerize.php';
+?>
+
+<script src="<?= $pluginRoot; ?>/js/composerize.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const templateSelect = $('#composerize-select');
+        const composeText = $('#compose-text');
+        const resetButton = $('#reset-button');
+        const undoButton = $('#undo-button');
+        const submitButton = $('#submit-button');
+
+        templateSelect.on('change', function () {
+            const value = this.value;
+            const compose = value ? composerize(value) : "";
+            submitButton.prop("disabled", value == false);
+            composeText.val(compose);
+
+            // Enable undo
+            undoButton.on('click', function () {
+                composeText.val(compose);
+            });
+        });
+
+        submitButton.on('click', function () {
+            const name = templateSelect.find('option:selected').text();
+            const compose = composeText.val();
+
+            const makeRequest = (force) => $.ajax({
+                type: "POST",
+                url: "<?=$pluginRoot;?>/api.php",
+                dataType: 'json',
+                data: {
+                    'name': name,
+                    'compose': compose,
+                    'force': force
+                },
+                success: function (response) {
+                    const status = response.status;
+
+                    if (status === "exists" && force === false) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "A docker compose stack already exists. Would you like to overwrite?",
+                            icon: "success",
+                            showCancelButton: true,
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "No",
+                            closeOnConfirm: false,
+                            closeOnCancel: true
+                        }, function (confirm) {
+                            if (confirm) {
+                                makeRequest(true);
+                            }
+                        });
+                    } else if (status === "success") {
+                        swal({
+                            title: "Success!",
+                            text: "Docker compose saved to disk.",
+                            icon: "success"
+                        });
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "Unable to save compose to disk.",
+                            icon: "error"
+                        });
+                    }
+                },
+                error: function (jqXHR, status, errorThrown) {
+                    console.log(jqXHR, status, errorThrown);
+                    if (status >= 500) {
+                        swal({
+                            title: "Error!",
+                            text: "There was an error.",
+                            icon: "error"
+                        });
+                    } else {
+                        swal({
+                            title: "Error!",
+                            text: "Compose is invalid.",
+                            icon: "error"
+                        });
+                    }
+                }
+            });
+
+            // Initially make the request with force off
+            // Prompt user if they wish to overwrite
+            // Run function again with this set to true
+            makeRequest(false);
+        });
+
+        resetButton.on('click', function () {
+            window.location.reload();
+        });
+
+        console.log("Plugin Ready!");
+    });
+</script>
+
+<div style="display: flex;">
+
+    <!-- selector side -->
+    <div style="float: left; padding: 10px; width: 25%;">
+        <h2>Template</h2>
+        <select id="composerize-select" style="width: 100%;">
+            <option value="" selected="selected">Choose One</option>
+            <?php foreach (getDockerTemplateList() as $key => $value): ?>
+                <option value='<?= htmlspecialchars($value); ?>'><?= htmlspecialchars($key); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <!-- end selector side -->
+
+    <!-- preview side -->
+    <div style="float: left; padding: 10px; width: 75%;">
+        <h2>Preview Compose</h2>
+        <textarea id="compose-text" style="font-family: bitstream; width: 100%;" spellcheck="false" cols="80"
+                  rows="22" maxlength="8192"></textarea>
+        <input id="submit-button" style="float: left; margin-right: 10px;" type="button" value="Apply"/>
+        <input id="undo-button" style="float: left; margin-right: 10px;" type="button" value="Original"/>
+        <input id="reset-button" style="float: right;" type="button" value="_(Reset)_"/>
+    </div>
+    <!-- end preview side -->
+
+</div>

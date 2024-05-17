@@ -2,13 +2,13 @@
 
 const DOCKER_TEMPLATE_DIRECTORY = '/boot/config/plugins/dockerMan/templates-user/';
 const COMPOSE_DIRECTORY = '/boot/config/plugins/compose.manager/projects/';
-const DOCKER_MANAGER_DIRECTORY = '/usr/local/emhttp/plugins/dynamix.docker.manager';
+const DOCKER_MANAGER_EMHTTP_PLUGIN_DIR = 'plugins/dynamix.docker.manager';
 
 $docroot = $docroot ?: $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
 
 // Initialize docker connection from dynamix docker plugin
-require_once("$docroot/plugins/dynamix.docker.manager/include/DockerClient.php");
-require_once("$docroot/plugins/dynamix.docker.manager/include/Helpers.php");
+require_once("$docroot/" . DOCKER_MANAGER_EMHTTP_PLUGIN_DIR . "/include/DockerClient.php");
+require_once("$docroot/" . DOCKER_MANAGER_EMHTTP_PLUGIN_DIR . "/include/Helpers.php");
 
 // ToDo allow for user customization
 $dockerClient = new DockerClient();
@@ -17,6 +17,8 @@ $dockerTemplates = new DockerTemplates();
 $custom = DockerUtil::custom();
 $subnet = DockerUtil::network($custom);
 $cpus = DockerUtil::cpus();
+
+$dockerManagerDirectory = '/usr/local/emhttp/' . DOCKER_MANAGER_EMHTTP_PLUGIN_DIR;
 
 function isValidYaml($yamlString): bool
 {
