@@ -15,7 +15,7 @@
  */
 
 $docroot = $docroot ?: $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
-$pluginRoot = '/plugins/composerize';
+$pluginRoot = '/plugins/ca.composerize';
 
 include $docroot . $pluginRoot . '/include/composerize.php';
 

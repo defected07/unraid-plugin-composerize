@@ -3,34 +3,41 @@
 <!ENTITY origName "composerize">
 <!ENTITY name "ca.composerize">
 <!ENTITY author "defected07">
-<!ENTITY version "20240416">
+<!ENTITY version "20240417">
+<!ENTITY md5 "8b21b7b559c00a502842e50ae63abc39">
+<!ENTITY branch "add-to-ca-repo">
 
-<!ENTITY packageVER "&version;">
-<!ENTITY packageMD5 "9d08e6834ac5ce6a864a63b5c6e2276f">
-<!ENTITY packageName "&name;-package-&packageVER;">
+<!-- Current Build Archive Name/Path -->
+<!-- <!ENTITY packageVER "&version;"> -->
+<!ENTITY packageName "&name;-package-&version;">
 <!ENTITY packageExt "txz">
 <!ENTITY packageFile "&packageName;.&packageExt;">
 
+<!-- GitHub Entities -->
 <!ENTITY repoDomain "https://github.com">
 <!ENTITY rawDomain "https://raw.githubusercontent.com">
-<!ENTITY releaseBranch "main">
 <!ENTITY authorRepoPaths "&author;/unraid-plugin-&origName;">
 <!ENTITY repoURLTemplate "&repoDomain;/&authorRepoPaths;">
-<!ENTITY releaseURL "&rawDomain;/&authorRepoPaths;/&releaseBranch;">
-<!ENTITY pluginURL "&rawDomain;/&authorRepoPaths;/&releaseBranch;/&name;.plg">
+<!ENTITY releaseURL "&rawDomain;/&authorRepoPaths;/&branch;">
+<!ENTITY pluginURL "&rawDomain;/&authorRepoPaths;/&branch;/&name;.plg">
 <!ENTITY packageURL "&repoDomain;/&github;/releases/download/&version;/&packageFile;">
 
+<!-- unRAID Entities -->
 <!ENTITY bootPlugins "/boot/config/plugins">
 <!ENTITY bootPluginDir "&bootPlugins;/&name;">
 <!ENTITY emhttpPlugins "/usr/local/emhttp/plugins">
 <!ENTITY emhttpPluginDir "&emhttpPlugins;/&name;">
 <!ENTITY emhttpPluginPage "CaComposerize">
 <!ENTITY launch "Settings/&emhttpPluginPage;">
-<!ENTITY dcManagerDep "compose.manager">
-<!ENTITY configExt "cfg">
+
+<!-- CA Plugin Dependencies -->
+<!-- <!ENTITY dcManagerDep "compose.manager"> -->
+<!-- webGui docker.compose.manager plugin -->
 <!ENTITY dcManagerPluginName "compose.manager">
+<!ENTITY configExt "cfg">
 <!ENTITY dcManagerEmhttpPluginDir "&emhttpPlugins;/&dcManagerPluginName;">
 <!ENTITY dcManagerEmhttpPluginCfg "&emhttpPlugins;/&dcManagerPluginName;/&dcManagerPluginName;.&configExt;">
+<!-- unRAID docker binary -->
 <!ENTITY dockerDep "docker">
 <!ENTITY dockerBin "/usr/bin/&dockerDep;">
 ]>
@@ -61,7 +68,7 @@
     # Check for dependencies
     missingDep = 0
     if [[ ! -f "&dcManagerEmhttpPluginCfg;" ]]; then
-        echo "missing requirement: &dcManagerDep;"
+        echo "missing requirement: &dcManagerPluginName;"
         missingDep++
 
     if [[ ! -f "&dockerBin;" ]]; then
@@ -78,7 +85,7 @@
 
 <FILE Name="&bootPluginDir;/&packageFile;" Run="upgradepkg --install-new">
     <URL>&releaseURL;/archive/&packageFile;</URL>
-    <MD5>&packageMD5;</MD5>
+    <MD5>&md5;</MD5>
 </FILE>
 
 <FILE Run="/bin/bash">
