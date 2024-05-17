@@ -2,6 +2,7 @@
 
 const DOCKER_TEMPLATE_DIRECTORY = '/boot/config/plugins/dockerMan/templates-user/';
 const COMPOSE_DIRECTORY = '/boot/config/plugins/compose.manager/projects/';
+const DOCKER_MANAGER_DIRECTORY = '/usr/local/emhttp/plugins/dynamix.docker.manager';
 
 $docroot = $docroot ?: $_SERVER['DOCUMENT_ROOT'] ?: '/usr/local/emhttp';
 
@@ -89,7 +90,7 @@ function getDockerTemplateList(): array
     foreach ($files as $file) {
         $info = xmlToCommand($file, false);
 
-        $command = str_replace("/usr/local/emhttp/plugins/dynamix.docker.manager/scripts/docker create", 'docker run', $info[0]);
+        $command = str_replace(DOCKER_MANAGER_DIRECTORY . "scripts/docker create", 'docker run', $info[0]);
         $name = $info[1];
 
         $dockerTemplates[$name] = $command;
